@@ -1591,9 +1591,25 @@ namespace Microsoft.Build.Utilities
         /// <returns>Collection of reference assembly locations.</returns>
         public static string GetPathToStandardLibraries(string targetFrameworkIdentifier, string targetFrameworkVersion, string targetFrameworkProfile, string platformTarget)
         {
+            return GetPathToStandardLibraries(targetFrameworkIdentifier, targetFrameworkVersion, targetFrameworkProfile, platformTarget, null);
+        }
+
+        /// <summary>
+        /// Returns the path to mscorlib and system.dll
+        /// </summary>
+        /// <param name="targetFrameworkIdentifier">Identifier being targeted</param>
+        /// <param name="targetFrameworkVersion">Version being targeted</param>
+        /// <param name="targetFrameworkProfile">Profile being targeted</param>
+        /// <param name="platformTarget">What is the targeted platform, this is used to determine where we should look for the standard libraries. Note, this parameter is only used for .net frameworks less than 4.0</param>
+        /// <param name="targetFrameworkRootPath">Root directory where the target framework will be looked for. Uses default path if this is null</param>
+        /// <exception cref="ArgumentNullException">When the frameworkName is null</exception>
+        /// <returns>Collection of reference assembly locations.</returns>
+        public static string GetPathToStandardLibraries(string targetFrameworkIdentifier, string targetFrameworkVersion, string targetFrameworkProfile, string platformTarget, string targetFrameworkRootPath)
+        {
             ErrorUtilities.VerifyThrowArgumentLength(targetFrameworkIdentifier, "targetFrameworkIdentifier");
             ErrorUtilities.VerifyThrowArgumentLength(targetFrameworkVersion, "targetFrameworkVersion");
 
+            Console.WriteLine($"@@@@@@@@@@@@@@@@@@@@@@@ GetPathToStandardLibraries root: {targetFrameworkRootPath}");
             Version frameworkVersion = ConvertTargetFrameworkVersionToVersion(targetFrameworkVersion);
             // For .net framework less than 4 the mscorlib should be found in the .net 2.0 directory
             if (targetFrameworkIdentifier.Equals(FrameworkLocationHelper.dotNetFrameworkIdentifier, StringComparison.OrdinalIgnoreCase) && frameworkVersion.Major < 4 && String.IsNullOrEmpty(targetFrameworkProfile))
@@ -1626,16 +1642,18 @@ namespace Microsoft.Build.Utilities
                 // location, if so then we can just use what ever version they passed in because it should be MSIL now and not bit specific.
             }
 
-            IList<string> referenceAssemblyDirectories = GetPathToReferenceAssemblies(targetFrameworkIdentifier, targetFrameworkVersion, targetFrameworkProfile);
+            IList<string> referenceAssemblyDirectories = GetPathToReferenceAssemblies(targetFrameworkIdentifier, targetFrameworkVersion, targetFrameworkProfile, targetFrameworkRootPath);
             // Check each returned reference assembly directory for one containing mscorlib.dll
             // When we find it (most of the time it will be the first in the set) we'll
             // return that directory.
             foreach (string referenceAssemblyDirectory in referenceAssemblyDirectories)
             {
+                Console.WriteLine($"@@@@@@@@@@@@@@@@@@@@@@@ GetPathToStandardLibraries referenceAssemblyDirectory: {referenceAssemblyDirectory}");
                 if (File.Exists(Path.Combine(referenceAssemblyDirectory, "mscorlib.dll")))
                 {
                     // We found the framework reference assembly directory with mscorlib in it
                     // that's our standard lib path, so return it, with no trailing slash.
+                    Console.WriteLine($"@@@@@@@@@@@@@@@@@@@@@@@ GetPathToStandardLibraries found mscorlib, returning {referenceAssemblyDirectory}");
                     return FileUtilities.EnsureNoTrailingSlash(referenceAssemblyDirectory);
                 }
             }
@@ -1657,13 +1675,36 @@ namespace Microsoft.Build.Utilities
         /// <returns>Collection of reference assembly locations.</returns>
         public static IList<String> GetPathToReferenceAssemblies(string targetFrameworkIdentifier, string targetFrameworkVersion, string targetFrameworkProfile)
         {
+            return GetPathToReferenceAssemblies(targetFrameworkIdentifier, targetFrameworkVersion, targetFrameworkProfile, null);
+        }
+
+        /// <summary>
+        /// Returns the paths to the reference assemblies location for the given target framework.
+        /// This method will assume the requested ReferenceAssemblyRoot path will be the ProgramFiles directory specified by Environment.SpecialFolder.ProgramFiles
+        /// In additon when the .NETFramework or .NET Framework targetFrameworkIdentifiers are seen and targetFrameworkVersion is 2.0, 3.0, 3.5 or 4.0 we will return the correctly chained reference assembly paths
+        /// for the legacy .net frameworks. This chaining will use the existing GetPathToDotNetFrameworkReferenceAssemblies to build up the list of reference assembly paths.
+        /// </summary>
+        /// <param name="targetFrameworkIdentifier">Identifier being targeted</param>
+        /// <param name="targetFrameworkVersion">Version being targeted</param>
+        /// <param name="targetFrameworkProfile">Profile being targeted</param>
+        /// <param name="targetFrameworkRootPath">Root directory which will be used to calculate the reference assembly path. The references assemblies will be
+        /// generated in the following way TargetFrameworkRootPath\TargetFrameworkIdentifier\TargetFrameworkVersion\SubType\TargetFrameworkSubType.
+        /// Uses the default path if this is null.
+        /// </param>
+        /// <exception cref="ArgumentNullException">When the frameworkName is null</exception>
+        /// <returns>Collection of reference assembly locations.</returns>
+        public static IList<String> GetPathToReferenceAssemblies(string targetFrameworkIdentifier, string targetFrameworkVersion, string targetFrameworkProfile, string targetFrameworkRootPath)
+        {
             ErrorUtilities.VerifyThrowArgumentLength(targetFrameworkVersion, "targetFrameworkVersion");
             ErrorUtilities.VerifyThrowArgumentLength(targetFrameworkIdentifier, "targetFrameworkIdentifier");
             ErrorUtilities.VerifyThrowArgumentNull(targetFrameworkProfile, "targetFrameworkProfile");
 
             Version frameworkVersion = ConvertTargetFrameworkVersionToVersion(targetFrameworkVersion);
             FrameworkNameVersioning targetFrameworkName = new FrameworkNameVersioning(targetFrameworkIdentifier, frameworkVersion, targetFrameworkProfile);
-            return GetPathToReferenceAssemblies(targetFrameworkName);
+            Console.WriteLine($"@@@@@@@@@@@@@@@@@@@@@@@ GetPathToReferenceAssemblies #1, targetFrameworkRootPath: '{targetFrameworkRootPath}'");
+            return String.IsNullOrEmpty(targetFrameworkRootPath)
+                        ? GetPathToReferenceAssemblies(targetFrameworkName)
+                        : GetPathToReferenceAssemblies(targetFrameworkRootPath, targetFrameworkName);
         }
 
 
@@ -1680,6 +1721,7 @@ namespace Microsoft.Build.Utilities
         {
             // Verify the framework class passed in is not null. Other than being null the class will ensure the framework moniker is correct
             ErrorUtilities.VerifyThrowArgumentNull(frameworkName, "frameworkName");
+            Console.WriteLine($"@@@@@@@@@@@@@@@@@@@@@@@ GetPathToReferenceAssemblies #2");
             IList<String> paths =
                 GetPathToReferenceAssemblies(
                     FrameworkLocationHelper.programFilesReferenceAssemblyLocation,
@@ -1923,6 +1965,7 @@ namespace Microsoft.Build.Utilities
             //Verify the framework class passed in is not null. Other than being null the class will ensure it is consistent and the internal state is correct
             ErrorUtilities.VerifyThrowArgumentNull(frameworkName, "frameworkName");
 
+            Console.WriteLine($"@@@@@@@@@@@@@@@@@@@@@@@ GetPathToReferenceAssemblies #3, root: ${targetFrameworkRootPath}");
             string referenceAssemblyCacheKey = GenerateReferenceAssemblyCacheKey(targetFrameworkRootPath, frameworkName);
             CreateReferenceAssemblyPathsCache();
 
@@ -1936,6 +1979,7 @@ namespace Microsoft.Build.Utilities
             }
 
             // Try and find the reference assemblies using the reference assembly path generation algorithm
+            Console.WriteLine($"@@@@@@@@@@@@@@@@@@@@@@@ GetPathToReferenceAssemblies #3a, calling GetPathAndChainReferenceAssemblyLocations");
             IList<string> dotNetFrameworkReferenceAssemblies = GetPathAndChainReferenceAssemblyLocations(targetFrameworkRootPath, frameworkName, true);
 
             // We have not found any reference assembly locations, if we are the .net framework we can try and fallback to the old legacy tool location helper methods
@@ -1961,6 +2005,7 @@ namespace Microsoft.Build.Utilities
 
             for (int i = 0; i < dotNetFrameworkReferenceAssemblies.Count; i++)
             {
+                Console.WriteLine($"@@@@@@@@@@@@@@@@@@@@@@@ GetPathToReferenceAssemblies #3b, dotNetFrameworkReferenceAssemblies[{i}] = {dotNetFrameworkReferenceAssemblies[i]}");
                 if (
                     !dotNetFrameworkReferenceAssemblies[i].EndsWith(
                         Path.DirectorySeparatorChar.ToString(),
