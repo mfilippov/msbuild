@@ -119,6 +119,13 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     -->
 
   <PropertyGroup>
+      <!--
+         We support two types/styles of debug file names here:
+         1. `.pdb` style - foo.dll => foo.pdb , foo.exe => foo.pdb
+         2. !`.pdb` style, like '.mdb' - foo.dll => foo.dll.mdb, foo.exe => foo.exe.mdb
+    -->
+    <PdbFileExt>.pdb</PdbFileExt>
+    <DebugFileExt Condition="'$(DebugFileExt)' == ''">$(PdbFileExt)</DebugFileExt>
     <!-- Ensure any OutputPath has a trailing slash, so it can be concatenated -->
     <OutputPath Condition="'$(OutputPath)' != '' and !HasTrailingSlash('$(OutputPath)')">$(OutputPath)\</OutputPath>
     <AssemblyName Condition=" '$(AssemblyName)'=='' ">$(MSBuildProjectName)</AssemblyName>
@@ -348,13 +355,15 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   </ItemGroup>
 
   <ItemGroup Condition="'$(_DebugSymbolsProduced)' == 'true'">
-    <_DebugSymbolsIntermediatePath Include="$(IntermediateOutputPath)$(TargetName).compile.pdb" Condition="'$(OutputType)' == 'winmdobj' and '@(_DebugSymbolsIntermediatePath)' == ''"/>
-    <_DebugSymbolsIntermediatePath Include="$(IntermediateOutputPath)$(TargetName).pdb" Condition="'$(OutputType)' != 'winmdobj' and '@(_DebugSymbolsIntermediatePath)' == ''"/>
+    <_DebugSymbolsIntermediatePath Include="$(IntermediateOutputPath)$(TargetName).compile$(PdbFileExt)" Condition="'$(OutputType)' == 'winmdobj' and '@(_DebugSymbolsIntermediatePath)' == ''"/>
+    <_DebugSymbolsIntermediatePath Include="$(IntermediateOutputPath)$(TargetName)$(DebugFileExt)" Condition="'$(OutputType)' != 'winmdobj' and '@(_DebugSymbolsIntermediatePath)' == '' and '$(DebugFileExt)' == '$(PdbFileExt)'"/>
+    <!-- Mono's compilers use foo.dll.mdb as the debug filename for an assembly named foo.dll -->
+    <_DebugSymbolsIntermediatePath Include="$(IntermediateOutputPath)$(TargetName)$(TargetExt)$(DebugFileExt)" Condition="'$(OutputType)' != 'winmdobj' and '@(_DebugSymbolsIntermediatePath)' == '' and '$(DebugFileExt)' != '$(PdbFileExt)'"/>
     <_DebugSymbolsOutputPath Include="@(_DebugSymbolsIntermediatePath->'$(OutDir)%(Filename)%(Extension)')" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(_DebugSymbolsProduced)' == 'true' and '$(OutputType)' == 'winmdobj'">
-    <WinMDExpOutputPdb Condition="'$(WinMDExpOutputPdb)' == ''">$(IntermediateOutputPath)$(TargetName).pdb</WinMDExpOutputPdb>
+    <WinMDExpOutputPdb Condition="'$(WinMDExpOutputPdb)' == ''">$(IntermediateOutputPath)$(TargetName)$(PdbFileExt)</WinMDExpOutputPdb>
     <_WinMDDebugSymbolsOutputPath>$([System.IO.Path]::Combine('$(OutDir)', $([System.IO.Path]::GetFileName('$(WinMDExpOutputPdb)'))))</_WinMDDebugSymbolsOutputPath>
   </PropertyGroup>
 
@@ -565,11 +574,29 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     </AllowedReferenceAssemblyFileExtensions>
 
     <!--
+        These are the extensions that reference resolution will consider when looking for debug files related
+        to resolved references, for .pdb files
+        -->
+    <AllowedReferenceRelatedDebugFileExtensions Condition="'$(DebugFileExt)' == '$(PdbFileExt)'">
+        $(DebugFileExt)
+    </AllowedReferenceRelatedDebugFileExtensions>
+
+    <!--
+        These are the extensions that reference resolution will consider when looking for debug files related
+        to resolved references, for .mdb files when using mono's compilers.
+        Mono's compilers use foo.dll.mdb as the debug filename for an assembly named foo.dll
+        -->
+    <AllowedReferenceRelatedDebugFileExtensions Condition="'$(DebugFileExt)' != '$(PdbFileExt)'">
+        .exe$(DebugFileExt);
+        .dll$(DebugFileExt)
+    </AllowedReferenceRelatedDebugFileExtensions>
+
+    <!--
         These are the extensions that reference resolution will consider when looking for files related
         to resolved references.  Add new extensions here if you want to add new file types to consider.
         -->
     <AllowedReferenceRelatedFileExtensions Condition=" '$(AllowedReferenceRelatedFileExtensions)' == '' ">
-      .pdb;
+      $(AllowedReferenceRelatedDebugFileExtensions);
       .xml;
       .pri
     </AllowedReferenceRelatedFileExtensions>
@@ -5391,7 +5418,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
     <!-- This item represents dependent PDB's -->
     <ItemGroup>
-      <DebugSymbolsProjectOutputGroupDependency Include="@(_ReferenceRelatedPaths->'%(FullPath)')" Condition="'%(Extension)' == '.pdb'"/>
+      <DebugSymbolsProjectOutputGroupDependency Include="@(_ReferenceRelatedPaths->'%(FullPath)')" Condition="'%(Extension)' == '$(DebugFileExt)'"/>
     </ItemGroup>
 
   </Target>
