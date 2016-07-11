@@ -4,6 +4,9 @@
     "System.Threading.Tasks.Dataflow": "4.5.26-rc3-24109-00"
   },
   "frameworks": {
+    "net45": {
+      "dependencies": {}
+    },
     "net451": {
       "dependencies": {}
     },

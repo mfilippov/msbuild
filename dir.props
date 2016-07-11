@@ -169,7 +169,7 @@
     <PlatformTarget>$(RuntimeArchitecture)</PlatformTarget>
     <ImportGetNuGetPackageVersions Condition="'$(OS)' != 'Windows_NT'">false</ImportGetNuGetPackageVersions>
     <NuGetTargetMoniker Condition="'$(NetCoreBuild)' == 'true'">.NETStandard,Version=v1.3</NuGetTargetMoniker>
-    <NuGetTargetMoniker Condition="'$(NetCoreBuild)' != 'true'">.NETFramework,Version=v4.6</NuGetTargetMoniker>
+    <NuGetTargetMoniker Condition="'$(NetCoreBuild)' != 'true'">.NETFramework,Version=v4.5</NuGetTargetMoniker>
   </PropertyGroup>
 
   <!-- This configuration builds against the full .NET Framework but with the compilation constants to compile against
@@ -180,12 +180,12 @@
     <DebugType Condition="'$(DebugType)' == ''">full</DebugType>
     <DefineConstants>$(DefineConstants);DEBUG;TRACE;STANDALONEBUILD</DefineConstants>
     <NetCoreSurface>true</NetCoreSurface>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
 
   <!-- Both Mono and windows/full framework builds -->
   <PropertyGroup Condition="'$(NetCoreBuild)' != 'true'">
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
 
   <!-- .NET Core build support -->

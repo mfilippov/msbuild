@@ -1345,7 +1345,7 @@ namespace Microsoft.Build.BackEnd
                 Type eventArgsType = loadedEventArgsType.Type;
 
                 ConstructorInfo constructor = GetConstructor(eventArgsType);
-                BuildEventArgs ret = (BuildEventArgs)constructor.Invoke(Array.Empty<object>());
+                BuildEventArgs ret = (BuildEventArgs)constructor.Invoke(new object[0]);
 
                 FieldSerializer.DeserializeFields(ret, serializedBuildEventArgs.SerializedFields);
 

@@ -10,6 +10,7 @@
     "xunit.netcore.extensions": "1.0.0-prerelease-00410-02"
   },
   "frameworks": {
+    "net45": {},
     "net46": {
       "dependencies": {
         "xunit.runner.visualstudio": "2.1.0",
