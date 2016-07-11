@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <ProjectWithoutConfiguration Include="src\dirs.proj" />
-    <ProjectWithoutConfiguration Include="Samples\dirs.proj" Condition="'$(BuildSamples)'!='false'" />
   </ItemGroup>
 
   <Import Project="dir.targets" />

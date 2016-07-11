@@ -104,31 +104,6 @@
   <Target Name="DeployRuntime"
           DependsOnTargets="RestoreRuntimePackages"
           >
-    <PrereleaseResolveNuGetPackageAssets AllowFallbackOnTargetSelection="false"
-                                         IncludeFrameworkReferences="false"
-                                         NuGetPackagesDirectory="$(PackagesDir)"
-                                         RuntimeIdentifier="$(NuGetRuntimeIdentifier)"
-                                         ProjectLanguage="C#"
-                                         ProjectLockFile="$(RuntimeProjectLockJson)"
-                                         TargetMonikers="$(NuGetTargetMoniker)">
-
-      <!--<Output TaskParameter="ResolvedAnalyzers" ItemName="Analyzer" />-->
-      <Output TaskParameter="ResolvedCopyLocalItems" ItemName="ResolvedRuntimeFiles" />
-      <!--<Output TaskParameter="ResolvedReferences" ItemName="_ReferencesFromNuGetPackages" />
-      <Output TaskParameter="ReferencedPackages" ItemName="ReferencedNuGetPackages" />-->
-    </PrereleaseResolveNuGetPackageAssets>
-
-    <!-- Copy the dependencies to both the deployment and the test directories -->
-
-    <Copy SourceFiles="@(ResolvedRuntimeFiles)"
-          DestinationFolder="$(DeploymentDir)"
-          SkipUnchangedFiles="true"
-          />
-
-    <Copy SourceFiles="@(ResolvedRuntimeFiles)"
-          DestinationFolder="$(TestDeploymentDir)"
-          SkipUnchangedFiles="true"
-          />
   </Target>
 
   <Target Name="SetUnixPermissions"
