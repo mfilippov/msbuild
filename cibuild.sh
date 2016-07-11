@@ -153,6 +153,8 @@ elif [ "$SCOPE" = "Test" ]; then
 	TARGET_ARG="BuildAndTest"
 fi
 
+#Set default target as Mono
+target=Mono
 # Determine configuration
 case $target in
     CoreCLR)
@@ -171,6 +173,8 @@ case $target in
         ;;
 esac
 
+#Set default host as Mono
+host=Mono
 # Determine runtime host
 until [[ "$RUNTIME_HOST" != "" ]]; do
       case $host in
@@ -209,17 +213,17 @@ if [[ $SKIP_BOOTSTRAP = true ]]; then
     exit $?
 fi
 
-echo
-echo "** Moving bootstrapped MSBuild to the bootstrap folder"
-MOVE_MSBUILD_ARGS="$BOOTSTRAP_FILE_ARG /p:OS=$OS_ARG /p:Configuration=$CONFIGURATION /verbosity:minimal"
-runMSBuildWith "$RUNTIME_HOST" "$RUNTIME_HOST_ARGS" "$MSBUILD_EXE" "$MOVE_MSBUILD_ARGS" "$MOVE_LOG_PATH"
+#echo
+#echo "** Moving bootstrapped MSBuild to the bootstrap folder"
+#MOVE_MSBUILD_ARGS="$BOOTSTRAP_FILE_ARG /p:OS=$OS_ARG /p:Configuration=$CONFIGURATION /verbosity:minimal"
+#runMSBuildWith "$RUNTIME_HOST" "$RUNTIME_HOST_ARGS" "$MSBUILD_EXE" "$MOVE_MSBUILD_ARGS" "$MOVE_LOG_PATH"
 
 # Use the "current" coreclr runtime host; the one in tools/ may be
 # stale and incompatible.
-if [[ "$host" = "CoreCLR" ]]; then
-    RUNTIME_HOST=$CORERUN_BOOTSTRAPPED_EXE
-fi
+#if [[ "$host" = "CoreCLR" ]]; then
+#    RUNTIME_HOST=$CORERUN_BOOTSTRAPPED_EXE
+#fi
 
-echo
-echo "** Rebuilding MSBuild with locally built binaries"
-runMSBuildWith "$RUNTIME_HOST" "$RUNTIME_HOST_ARGS" "$MSBUILD_BOOTSTRAPPED_EXE" "$BUILD_MSBUILD_ARGS" "$LOCAL_BUILD_LOG_PATH"
+#echo
+#echo "** Rebuilding MSBuild with locally built binaries"
+#runMSBuildWith "$RUNTIME_HOST" "$RUNTIME_HOST_ARGS" "$MSBUILD_BOOTSTRAPPED_EXE" "$BUILD_MSBUILD_ARGS" "$LOCAL_BUILD_LOG_PATH"
