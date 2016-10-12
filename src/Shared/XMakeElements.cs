@@ -35,7 +35,7 @@ namespace Microsoft.Build.Shared
         internal const string usingTaskParameter = "Parameter";
         internal const string usingTaskBody = "Task";
 
-        internal static readonly char[] illegalTargetNameCharacters = new char[] { '$', '@', '(', ')', '%', '*', '?', '.' };
+        internal static readonly char[] illegalTargetNameCharacters = new char[] { '$', '@', '(', ')', '%', '*', '?'/*, '.'*/ };
 
         // Names that cannot be used as property or item names because they are reserved
         internal static readonly string[] illegalPropertyOrItemNames = new string[] {
