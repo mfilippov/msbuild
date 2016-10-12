@@ -941,7 +941,7 @@ namespace Microsoft.Build.Evaluation
                 {
                     foreach (Pair<ProjectMetadataElement, string> metadatum in metadata)
                     {
-                        item.SetMetadata(metadatum.Key, metadatum.Value);
+                        item.SetMetadata(metadatum.Key, metadatum.Key.ElementName == "HintPath" ? FileUtilities.FixFilePath(metadatum.Value) : metadatum.Value);
                     }
                 }
             }
