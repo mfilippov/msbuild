@@ -293,13 +293,13 @@
     <!-- We should enable FileTracker feature for incremental build C++ on Windows -->
     <DefineConstants Condition="'$(MonoBuild)' != 'true'">$(DefineConstants);FEATURE_FILE_TRACKER</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_FUSION_COMPAREASSEMBLYIDENTITY</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_GAC</DefineConstants>
+    <DefineConstants Condition="'$(JetBuild)' != 'true'">$(DefineConstants);FEATURE_GAC</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_GET_COMMANDLINE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_HANDLE_SAFEWAITHANDLE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_HANDLEPROCESSCORRUPTEDSTATEEXCEPTIONS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_HANDLEREF</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_HTTP_LISTENER</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_INSTALLED_MSBUILD</DefineConstants>
+    <DefineConstants Condition="'$(JetBuild)' != 'true'">$(DefineConstants);FEATURE_INSTALLED_MSBUILD</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_LEGACY_GETFULLPATH</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_MEMORYSTREAM_GETBUFFER</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_NAMED_PIPES_FULL_DUPLEX</DefineConstants>
@@ -308,9 +308,9 @@
     <DefineConstants>$(DefineConstants);FEATURE_PIPE_SECURITY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_PFX_SIGNING</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_REFLECTION_EMIT_DEBUG_INFO</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_REGISTRY_TOOLSETS</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_REGISTRY_SDKS</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_REGISTRYHIVE_DYNDATA</DefineConstants>
+    <DefineConstants Condition="'$(JetBuild)' != 'true'">$(DefineConstants);FEATURE_REGISTRY_TOOLSETS</DefineConstants>
+    <DefineConstants Condition="'$(JetBuild)' != 'true'">$(DefineConstants);FEATURE_REGISTRY_SDKS</DefineConstants>
+    <DefineConstants Condition="'$(JetBuild)' != 'true'">$(DefineConstants);FEATURE_REGISTRYHIVE_DYNDATA</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RESGEN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RESOURCE_EXPOSURE</DefineConstants>
     <!-- System.Resources.ResourceManager.GetResourceSet() method is currently only in full framework -->
@@ -334,7 +334,7 @@
     <DefineConstants>$(DefineConstants);FEATURE_THREAD_CULTURE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_THREAD_PRIORITY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_MULTIPLE_TOOLSETS</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_NODE_REUSE</DefineConstants>
+    <DefineConstants Condition="'$(JetBuild)' != 'true'">$(DefineConstants);FEATURE_NODE_REUSE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_TYPE_INVOKEMEMBER</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_TYPE_GETINTERFACE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_USERINTERACTIVE</DefineConstants>
@@ -349,7 +349,7 @@
     <DefineConstants>$(DefineConstants);FEATURE_XMLTEXTREADER</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_DEBUGGER</DefineConstants>
     <DefineConstants Condition="'$(MonoBuild)' != 'true' and '$(JetBuild)' != 'true'">$(DefineConstants);FEATURE_DEBUG_LAUNCH</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_WIN32_REGISTRY</DefineConstants>
+    <DefineConstants Condition="'$(JetBuild)' != 'true'">$(DefineConstants);FEATURE_WIN32_REGISTRY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_WORKINGSET</DefineConstants>
     <DefineConstants Condition="'$(MonoBuild)' != 'true' and '$(JetBuild)' != 'true'">$(DefineConstants);FEATURE_VISUALSTUDIOSETUP</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_MSCOREE</DefineConstants>
