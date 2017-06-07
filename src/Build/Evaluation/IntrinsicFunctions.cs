@@ -258,6 +258,32 @@ namespace Microsoft.Build.Evaluation
             // We will have either found a result or defaultValue if one wasn't found at this point
             return result;
         }
+        
+#else // FEATURE_WIN32_REGISTRY is off, need to mock the function names to let scrips call these property functions and get NULLs rather than fail with errors
+
+        /// <summary>
+        /// Get the value of the registry key and value, default value is null
+        /// </summary>
+        internal static object GetRegistryValue(string keyName, string valueName)
+        {
+            return null; // FEATURE_WIN32_REGISTRY is off, need to mock the function names to let scrips call these property functions and get NULLs rather than fail with errors
+        }
+
+        /// <summary>
+        /// Get the value of the registry key and value
+        /// </summary>
+        internal static object GetRegistryValue(string keyName, string valueName, object defaultValue)
+        {
+            return null; // FEATURE_WIN32_REGISTRY is off, need to mock the function names to let scrips call these property functions and get NULLs rather than fail with errors
+        }
+
+        /// <summary>
+        /// Get the value of the registry key from one of the RegistryView's specified
+        /// </summary>
+        internal static object GetRegistryValueFromView(string keyName, string valueName, object defaultValue, params object[] views)
+        {
+            return null; // FEATURE_WIN32_REGISTRY is off, need to mock the function names to let scrips call these property functions and get NULLs rather than fail with errors
+        }
 #endif
 
         /// <summary>
