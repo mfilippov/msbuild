@@ -231,3 +231,6 @@ Samples/MultiprocessBuild/PortableTask.dll
 
 # Visual Studio Code
 .vscode/
+
+# Rider
+.idea/
